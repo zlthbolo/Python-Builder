@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اختبار هندسة الموانئ</title>
+<meta name="theme-color" content="#0b3144">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#06151f;color:#eef7fb;font-family:Segoe UI,Tahoma,Arial,sans-serif}.app{max-width:920px;margin:auto;padding:14px}.card{background:#0c2736;border:1px solid #ffffff18;border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 16px 45px #0006}.hero{background:linear-gradient(135deg,#10384b,#081e2a)}h1{margin:.1em 0}.muted{color:#9bb6c5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.box{display:flex;gap:8px;align-items:center;border:1px solid #ffffff18;padding:11px;border-radius:13px;background:#ffffff08}.btn{border:0;border-radius:13px;padding:12px 15px;background:#173b4d;color:#fff;cursor:pointer}.btn.primary{background:#46d4c1;color:#04242a;font-weight:800}.btn.warn{background:#5d4618;color:#ffe3a0}.btn:disabled{opacity:.45}.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}.hidden{display:none!important}.badge{display:inline-block;padding:6px 9px;border-radius:999px;border:1px solid #47d7c544;background:#47d7c514;color:#cffff7;font-size:12px;margin:2px}.q{font-size:clamp(20px,3.6vw,29px);line-height:1.75;margin:15px 0}.options{display:grid;gap:9px}.opt{padding:13px;border-radius:13px;border:1px solid #ffffff18;background:#0f3142;color:#fff;text-align:right;cursor:pointer}.opt.correct{border-color:#45d483;background:#45d48320}.opt.wrong{border-color:#ff6b78;background:#ff6b7820}.panel{margin-top:12px;padding:13px;border-radius:14px;border:1px solid #ffffff18;background:#ffffff08;line-height:1.9}.bar{height:8px;background:#ffffff12;border-radius:999px;overflow:hidden}.bar>div{height:100%;background:linear-gradient(90deg,#46d4c1,#61a9ff);width:0}.top{position:sticky;top:5px;z-index:3;background:#071a24e8;backdrop-filter:blur(10px);padding:9px;border:1px solid #ffffff18;border-radius:14px;display:flex;justify-content:space-between;align-items:center}.score{font-size:48px;font-weight:900}select{width:100%;padding:11px;background:#0b2230;color:#fff;border:1px solid #ffffff18;border-radius:12px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']]}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body><div class="app">
+<section id="start">
+<div class="card hero"><h1>⚓ اختبار هندسة الموانئ</h1><p class="muted">تصحيح فوري، شرح مبسط، وخطوات حل تظهر <b>قبل</b> اختيار الإجابة. المعادلات تظهر بتنسيق رياضي واضح.</p><div id="total" class="badge"></div><span class="badge">أسئلة من ملفاتك</span><span class="badge">أسئلة جديدة</span><span class="badge">موانئ يمنية</span></div>
+<div class="card"><h2>اختيار الاختبار</h2><div class="grid" id="srcs">
+<label class="box"><input type="checkbox" value="ملف محلول" checked> ملف الاختبار المحلول</label>
+<label class="box"><input type="checkbox" value="نموذج مؤتمت" checked> النموذج المؤتمت</label>
+<label class="box"><input type="checkbox" value="جديدة" checked> أسئلة غير منسوخة</label>
+<label class="box"><input type="checkbox" value="موانئ يمنية" checked> موانئ يمنية</label></div>
+<div class="grid" style="margin-top:12px"><div><div class="muted">عدد الأسئلة</div><select id="count"><option>20</option><option selected>40</option><option>80</option><option>120</option><option value="9999">الكل</option></select></div><div><div class="muted">الترتيب</div><select id="order"><option value="random" selected>عشوائي</option><option value="fixed">حسب المصدر</option></select></div></div>
+<div class="row" style="margin-top:14px"><button class="btn primary" id="go">ابدأ الامتحان 🚀</button><button class="btn" id="newOnly">الجديدة فقط</button></div></div>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="top"><div><b id="n"></b><div class="muted" id="mini"></div></div><button class="btn" id="home">الرئيسية</button></div><div class="bar"><div id="prog"></div></div>
+<div class="card"><div><span class="badge" id="src"></span><span class="badge" id="cat"></span><span class="badge" id="diff"></span></div>
+<div class="q" id="qt"></div>
+<div class="row"><button class="btn" id="ex">💡 شرح بسيط</button><button class="btn warn" id="steps">🧮 خطوات الحل قبل الإجابة</button></div>
+<div class="panel hidden" id="ep"></div><div class="panel hidden" id="sp"></div>
+<div class="options" id="opts" style="margin-top:12px"></div>
+<div class="hidden" id="fb"><div id="res" style="font-weight:800;margin-top:12px"></div><div class="panel" id="why"></div></div>
+<div class="row" style="margin-top:14px"><button class="btn" id="prev">السابق</button><button class="btn primary" id="next">التالي</button></div></div>
+</section>
+
+<section id="result" class="hidden"><div class="card hero"><div class="muted">انتهى الاختبار</div><div class="score" id="pct"></div><div id="msg"></div></div><div class="card"><div class="grid"><div><div class="muted">صحيح</div><h2 id="ok"></h2></div><div><div class="muted">خطأ</div><h2 id="bad"></h2></div><div><div class="muted">المجموع</div><h2 id="tot"></h2></div></div><div class="row"><button class="btn primary" id="retry">أعد الأخطاء فقط</button><button class="btn" id="again">اختبار جديد</button></div></div></section>
+</div>
+
+<script>
+function q(id,src,cat,diff,question,options,answer,exp,steps){return {id:id,source:src,category:cat,difficulty:diff,question:question,options:options,answer:answer,explanation:exp,steps:steps||exp}}
+
+var A=[
+q("s1","ملف محلول","تخطيط الموانئ","أساسي","يكون عرض مدخل الميناء حسب القاعدة المستخدمة في نموذج المقرر:",["مساويًا لطول السفينة","ضعف طول السفينة","أقل من عرض أكبر سفينة","أكبر من عرض أكبر سفينة"],0,"وفق نموذج الاختبار يؤخذ عرض المدخل مساويًا لطول السفينة التصميمية الأكبر.","$$B_{in}=L$$"),
+q("s2","ملف محلول","كواسر الأمواج","حسابي","في مسألة رأس كاسر الأمواج Rough Quarry Stone، كانت كتلة حجر الـArmor الأقرب:",["8.5 ton","9.6 ton","3.5 ton","6.1 ton"],0,"الحل في الملف استخدم Hudson ومعامل رأس الكاسر ليصل إلى 8.5 طن.","$$L_0=1.56(8)^2\\approx100m$$ ثم $$H\\approx5(1.06)(0.60)\\approx3.2m$$ ثم Hudson."),
+q("s3","ملف محلول","المد والجزر","أساسي","تأثير الشمس المسبب للمد والجزر مقارنة بالقمر:",["يساويه","أقل منه","أقوى منه","كلها خطأ"],1,"القمر أقرب كثيرًا إلى الأرض، لذلك تأثيره المدي أكبر.","قرب القمر يجعل أثره المدي أكبر رغم كتلة الشمس الكبيرة."),
+q("s4","ملف محلول","تخطيط الموانئ","أساسي","إذا كان \\(L\\) طول السفينة، فنصف قطر مساحة الدوران في نموذج المقرر:",["2.5L","4.5L","2L","3L"],2,"القيمة المستخدمة في النموذج هي ضعف طول السفينة.","$$R=2L$$"),
+q("s5","ملف محلول","الأمواج","مفهومي","إذا كانت \\(d/L_0=0.6\\)، فما \\(C/C_0\\) تقريبًا؟",["0.5","1.1","1","1.9"],2,"لأن النسبة أكبر من 0.5 فالموجة في المياه العميقة تقريبًا.","$$d/L_0>0.5\\Rightarrow C/C_0\\approx1$$"),
+q("s6","ملف محلول","الأمواج","حسابي","إذا كان \\(L=57.5m\\) و\\(T=8s\\)، فما سرعة الموجة؟",["4.1 m/s","8.7 m/s","6.2 m/s","7.2 m/s"],3,"السرعة = الطول الموجي ÷ الزمن الدوري.","$$C=L/T=57.5/8\\approx7.2m/s$$"),
+q("s7","ملف محلول","كواسر الأمواج","حسابي","لـ \\(W=8.5t\\), \\(n=2\\), \\(K_\\Delta=1.15\\), \\(\\gamma_s=2.2t/m^3\\)، سمك الـArmor:",["1.3 m","3.6 m","2.4 m","5.1 m"],1,"الخيارات بالمتر، لذا المطلوب سمك الطبقة.","$$t=nK_\\Delta(W/\\gamma_s)^{1/3}\\approx3.6m$$"),
+q("s8","ملف محلول","الرياح","جدول","سرعة رياح 60 km/h تعادل تقريبًا على بيفورت:",["2","4","3","7"],3,"وفق جدول النموذج تقابل تقريبًا Beaufort 7.","ابحث عن 60 km/h في جدول Beaufort ثم اقرأ الفئة."),
+q("s9","ملف محلول","الأمواج","حسابي","عند \\(T=8s\\) و\\(d=6m\\)، طول الموجة المستخدم في نموذج الحل:",["51.1 m","57.5 m","74.2 m","67.1 m"],1,"المنحنى المرفق أعطى نحو 57.5 m.","$$L_0\\approx100m,\\ d/L_0\\approx0.06\\Rightarrow L\\approx57.5m$$"),
+q("s10","ملف محلول","الأمواج","أساسي","أمواج المياه العميقة تكون عندما:",["d يساوي أو يزيد عن L/2","d يساوي H","d أقل من L/2","d أكبر من L فقط"],0,"الحد المستخدم هو \\(d/L\\ge0.5\\).","$$d/L\\ge0.5$$"),
+q("s11","ملف محلول","الأمواج","حسابي","إذا كانت \\(E=0.291\\) و\\(C_g=6.3m/s\\)، قدرة الموجة:",["2.8 t/s","3.31 t/s","1.84 t/s","4.72 t/s"],2,"القدرة = الطاقة × سرعة المجموعة.","$$P=EC_g=0.291(6.3)\\approx1.84$$"),
+q("s12","ملف محلول","كواسر الأمواج","جدول","\\(K_D\\) لـ Rough Quarry Stone في جسم الكاسر Trunk، طبقتان عشوائيتان، أمواج غير مكسرة:",["4.0","3.6","1.0","2.0"],0,"هذه قيمة الجدول في النموذج لجسم الكاسر.","حدد Trunk + Random + n=2 + Non-breaking."),
+q("s13","ملف محلول","الأمواج","أساسي","فترة أمواج الرياح وفق المقرر عادة:",["ساعة","أكثر من 30 ثانية","أقل من 30 ثانية","30 دقيقة"],2,"أمواج الرياح قصيرة الفترة.","Wind waves → ثوانٍ."),
+q("s14","ملف محلول","ضغط الأمواج","حسابي","في مثال Sainflou بالمرفق، أقرب ضغط \\(p_1\\):",["2 t/m²","2.8 t/m²","3 t/m²","4 t/m²"],0,"الحل في الملف أعطى نحو 2.1 t/m²، فأقرب اختيار 2.","$$h_0=\\frac{\\pi H^2}{L}\\coth(2\\pi d/L)$$ ثم التعويض في علاقة الضغط."),
+q("s15","ملف محلول","الأمواج","حسابي","إذا كان \\(T=8s\\)، فما \\(C_0\\) في المياه العميقة؟",["17.5","14.5","12.5","15.5"],2,"نستخدم \\(C_0\\approx1.56T\\).","$$C_0=1.56(8)=12.48\\approx12.5m/s$$"),
+q("s16","ملف محلول","كواسر الأمواج","مفهومي","نسبة وزن حجر النواة Core إلى حجر Armor من الخيارات:",["150%","50%","100%","لا ينطبق أي منها"],3,"أحجار النواة أصغر بكثير من أحجار الـArmor.","$$W_{armor}>W_{underlayer}>W_{core}$$"),
+q("s17","ملف محلول","موانئ يمنية","من المقرر","وفق تصنيف نموذج المقرر، ميناء الحديدة:",["له كواسر دائمة","ليس لديه كاسر أمواج","له مؤقتة","دائمة ومؤقتة"],1,"هذه إجابة نموذج المقرر كما وردت في الملف، وليست تحديثًا هندسيًا حديثًا.","احفظها كسؤال مقرر."),
+q("s18","ملف محلول","المد والجزر","أساسي","وفق خيارات النموذج، دورة المد والجزر شبه اليومية تقريبًا كل:",["24 ساعة","كلها خطأ","12 ساعة","48 ساعة"],2,"الخيار المقصود في النموذج 12 ساعة تقريبًا.","القيمة الفعلية التقريبية بين مدين متتاليين 12س 25د."),
+q("s19","ملف محلول","كواسر الأمواج","أساسي","وزن حجر طبقة النواة يكون:",["أكبر من Armor","أقل من Underlayer","مساويًا لـArmor","كلها خطأ"],1,"أحجام الأحجار تتناقص نحو الداخل.","$$W_{armor}>W_{underlayer}>W_{core}$$"),
+q("s20","ملف محلول","الرياح","جدول","عند Fetch=50 mile وسرعة 32 mile/h ومدة 8.4h، ارتفاع الموجة في جدول النموذج:",["8.1 ft","12.2 ft","15.4 ft","13.8 ft"],1,"الجدول يعطي 12.2 ft.","32 mph ≈ Beaufort 7 ثم اقرأ صف Fetch=50."),
+q("s21","ملف محلول","الأمواج","حسابي","سرعة موجة \\(T=10s\\) عند عمق 200m:",["15.6 m/s","5","10","2"],0,"الماء عميق لأن 200m أكبر من نصف طول الموجة العميقة.","$$L_0=156m,\\ d>78m\\Rightarrow C=1.56T=15.6m/s$$"),
+q("s22","ملف محلول","الرياح","جدول","في نفس مثال Fetch=50 mile و32 mile/h و8.4h، فترة الموجة:",["6.1s","5.2s","4.5s","7.3s"],1,"الجدول يعطي 5.2s.","قراءة مباشرة من جدول النموذج."),
+q("s23","ملف محلول","الأمواج","مفهومي","أي خيار يمثل شرط الانكسار Breaking في السؤال؟",["رياح شديدة فقط","المد والجزر","اصطدام بحائط","كل الثلاثة ليست الشرط الصحيح"],3,"الانكسار يحدث عند عدم استقرار الموجة في الماء الضحل.","اصطدام الحائط يسبب غالبًا Reflection لا Breaking."),
+q("s24","ملف محلول","الأمواج","حسابي","إذا كان \\(H=1.5m\\), \\(\\gamma=1.035t/m^3\\)، فأقرب خيار لطاقة الموجة:",["1.554","3.643","2.144","0.285"],3,"الحساب ≈0.291 وأقرب خيار في النموذج 0.285.","$$E=\\gamma H^2/8\\approx0.291$$"),
+q("s25","ملف محلول","الأمواج","حسابي","إذا كان \\(T=8s\\) ولم يعط العمق، طول الموجة العميقة:",["132m","100m","120m","124m"],1,"نستخدم علاقة المياه العميقة.","$$L_0=1.56(8)^2=99.84\\approx100m$$"),
+q("s26","ملف محلول","تخطيط الموانئ","أساسي","المساحة المائية للميناء اقتصاديًا يجب أن تكون:",["أكبر ما يمكن","أقل ما يمكن مع تحقيق الأمان","مساوية للأرصفة","كلها خطأ"],1,"تكفي للملاحة والمناورة دون زيادة تكريك وحماية غير لازمة.","كافية وآمنة، لكن لا تُزاد بلا حاجة."),
+q("s27","ملف محلول","موانئ يمنية","من المقرر","وفق نموذج المقرر، كاسر أمواج ميناء المكلا من:",["تربة مدكوكة","خرسانة وأحجار","حديد","أخشاب"],1,"الإجابة الواردة في نموذج المقرر: خرسانة وأحجار.","سؤال حفظ مباشر."),
+q("s28","ملف محلول","الأمواج","أساسي","من مراحل الموجة البحرية في النموذج:",["الكل صحيح","التكوين والانتقال","الانكسار والتحطم","التأثر بالتضاريس"],0,"كلها مراحل أو تحولات واردة في النموذج.","تكوّن → انتقال → تأثير القاع → انكسار."),
+q("s29","ملف محلول","تخطيط الموانئ","حسابي","عرض حارة ملاحية واحدة عند تحكم جيد بالسفينة:",["2L","160% من عرض السفينة","2×الغاطس","2×عرض السفينة"],1,"القيمة المستخدمة 1.60 من عرض السفينة.","$$B_c=1.6B$$"),
+q("s30","ملف محلول","الأمواج","أساسي","أي علاقة تخص المياه العميقة؟",["D>0.5L","D/L>0.004","D/L>0.04","كلها خطأ"],0,"حد المياه العميقة هو تقريبًا نصف طول الموجة.","$$D/L>0.5$$"),
+q("s31","ملف محلول","الأمواج","حسابي","إذا كان \\(T=10s\\) وعمق الماء 200m، طول الموجة:",["101.3m","90.25m","156m","100m"],2,"لأنها مياه عميقة نستخدم \\(L_0\\) مباشرة.","$$L=1.56(10)^2=156m$$"),
+q("s32","ملف محلول","الأمواج","من المقرر","في السؤال الملتبس بالنموذج، حد المياه الضحلة المقصود:",["أقل من 0.04","أكبر من 0.04","يساوي 0.04","يساوي 1"],0,"الملف ينبه أن صياغة السؤال ملتبسة، والمقصود \\(d/L<0.04\\).","$$d/L<0.04\\Rightarrow shallow$$"),
+q("s33","ملف محلول","المد والجزر","أساسي","المد الربيعي Spring Tide يحدث تقريبًا:",["مرتين شهريًا","مرة سنويًا","مرة شهريًا","مرة كل 3 أشهر"],0,"يحدث حول المحاق والبدر.","محاق + بدر → اصطفاف تقريبي → Spring Tide.")
+];
+
+var H=[
+q("h1","نموذج مؤتمت","الأمواج","أساسي","تعد المياه ضحلة عندما \\(d/L\\):",[">0.5","<0.04",">0.04","=1"],1,"هذا الحد ظاهر في النموذج المؤتمت.","$$d/L<0.04$$"),
+q("h2","نموذج مؤتمت","منشآت بحرية","أساسي","الحواجز الخرسانية في السؤال تعد:",["دائمة","مؤقتة","موسمية","غير بحرية"],0,"الخيار المطلوب في النموذج: دائمة.","منشأ خرساني ثابت للحماية."),
+q("h3","نموذج مؤتمت","المد والجزر","أساسي","تأثير الشمس في المد والجزر مقارنة بالقمر:",["أقل","أكبر","مساوٍ","منعدم"],0,"القمر أقرب، وتأثيره المدي أكبر.","معلومة مفاهيمية."),
+q("h4","نموذج مؤتمت","الأمواج","حسابي","في مسألة \\(T=8s,d=6m\\)، الزوج المطابق لـ\\(L,C\\):",["57.5m و7.2m/s","30.4m و8.3m/s","80.6m و1.8m/s","45.5m و12.5m/s"],0,"يتطابق مع نموذج الحل الآخر.","$$C=57.5/8\\approx7.2m/s$$"),
+q("h5","نموذج مؤتمت","الرياح","أساسي","فترة أمواج الرياح غالبًا في أسئلة المقرر:",["أقل من 30s","أكثر من ساعة","أيام","30 دقيقة"],0,"أمواج الرياح قصيرة الفترة.","Wind waves → seconds."),
+q("h6","نموذج مؤتمت","الأمواج","أساسي","المياه العميقة تحقق:",["D/L>0.5","D/L<0.04","D/L=0","D/L<0.01"],0,"حد المياه العميقة الشائع.","$$D>L/2$$"),
+q("h7","نموذج مؤتمت","التيارات البحرية","مفهومي","من مسببات التيارات البحرية:",["الرياح وفروق الكثافة والحرارة","لون الماء","عرض الرصيف","عدد الحاويات"],0,"هذه عوامل فيزيائية رئيسية.","رياح + فروق كثافة/ضغط."),
+q("h8","نموذج مؤتمت","الرياح","أساسي","وردة الرياح Wind Rose توضح:",["اتجاهات وتكرارات الرياح","أوزان الأحجار","أعماق الأرصفة فقط","أوقات المد فقط"],0,"تلخص الاتجاهات والتكرار وقد تعرض فئات السرعة.","القطاعات = اتجاهات."),
+q("h9","نموذج مؤتمت","المد والجزر","أساسي","Spring Tide يحدث تقريبًا:",["مرتين في الشهر القمري","مرة يوميًا","مرة سنويًا","كل 5 سنوات"],0,"حول البدر والمحاق.","بدر + محاق."),
+q("h10","نموذج مؤتمت","الأمواج","مفهومي","اصطدام الموجة بحائط صلب يرتبط أساسًا بـ:",["Reflection","Breaking","Fetch","Beaufort"],0,"الانعكاس هو رجوع الموجة عن الحائط.","Reflection = انعكاس.")
+];
+
+var Y=[
+q("y1","موانئ يمنية","موانئ يمنية","عام","المؤسسة التي تدير المكلا ونشطون وسقطرى:",["مؤسسة موانئ البحر العربي اليمنية","مؤسسة موانئ خليج عدن","مؤسسة موانئ البحر الأحمر","هيئة الطرق"],0,"الموقع الرسمي للمؤسسة يعرض الموانئ الثلاثة.","الشرق اليمني والبحر العربي → YASPC."),
+q("y2","موانئ يمنية","موانئ يمنية","عام","ميناء المكلا يقع في:",["حضرموت","المهرة","الحديدة","تعز"],0,"ميناء المكلا في حضرموت.","Mukalla → Hadramout."),
+q("y3","موانئ يمنية","موانئ يمنية","عام","افتتح ميناء المكلا الحالي في منطقة خلف في:",["يناير 1985","أبريل 1984","1996","2007"],0,"الموقع الرسمي يذكر يناير 1985.","Mukalla → Jan 1985."),
+q("y4","موانئ يمنية","موانئ يمنية","عام","ميناء نشطون يقع في:",["المهرة","حضرموت","عدن","الحديدة"],0,"نشطون في محافظة المهرة على البحر العربي.","Nashtoon → Al-Mahrah."),
+q("y5","موانئ يمنية","موانئ يمنية","عام","افتتح ميناء نشطون في:",["أبريل 1984","يناير 1985","1996","2020"],0,"الموقع الرسمي يذكر أبريل 1984.","Nashtoon → Apr 1984."),
+q("y6","موانئ يمنية","موانئ يمنية","عام","في سقطرى أنشئ لسان بحري عام 1996 برصيف يقارب:",["45m","450m","4.5m","145m"],0,"الموقع الرسمي يذكر 45m وغاطس 5m.","Socotra 1996 → 45m."),
+q("y7","موانئ يمنية","موانئ يمنية","كواسر","أحد خيارات تطوير ميناء المكلا:",["تمديد كاسر الأمواج الرئيسي وبناء رصيف 300m","إلغاء الكواسر","تحويله لمطار","إزالة الأرصفة"],0,"هذا أحد الخيارين الرسميين المنشورين للتطوير.","Extend main breakwater + 300m berth."),
+q("y8","موانئ يمنية","موانئ يمنية","كواسر","الخيار الثاني لتوسعة المكلا يتضمن:",["كاسرًا جديدًا وثلاثة أرصفة","رصيفًا واحدًا بلا حماية","إغلاق الميناء","ردم الحوض"],0,"الموقع الرسمي يذكر كاسرًا جديدًا وثلاثة أرصفة.","New breakwater + 3 berths."),
+q("y9","موانئ يمنية","موانئ يمنية","كواسر","دراسة ميناء بروم المستقبلي تتضمن كاسرًا بطول:",["1000m","100m","2800m","2750m"],0,"المعلومة واردة في صفحة المشاريع المستقبلية.","Barum → 1 breakwater → 1000m."),
+q("y10","موانئ يمنية","موانئ يمنية","كواسر","دراسة مشروع الضبة تتضمن عدد كواسر:",["2","1","3","0"],0,"الموقع الرسمي يذكر كاسرين.","Dabbah → 2 breakwaters."),
+q("y11","موانئ يمنية","موانئ يمنية","كواسر","دراسة قرمة في سقطرى تتضمن:",["كاسرين بطول 2800m","كاسرًا 100m","لا كواسر","4 كواسر"],0,"الموقع الرسمي يذكر كاسرين وطول 2800m.","Qarma → 2 → 2800m."),
+q("y12","موانئ يمنية","موانئ يمنية","كواسر","دراسة خلفوت في المهرة تتضمن:",["كاسرين بطول 2750m","كاسرًا 1000m","لا كواسر","5 كواسر"],0,"الموقع الرسمي يذكر كاسرين وطول 2750m.","Khalfot → 2 → 2750m."),
+q("y13","موانئ يمنية","موانئ يمنية","عام","ميناء الصليف يقع تقريبًا:",["شمال غرب الحديدة","شرق صنعاء","وسط مأرب","جنوب سيئون"],0,"الموقع الرسمي لموانئ البحر الأحمر يضعه شمال غرب الحديدة.","Salif → NW of Hodeidah."),
+q("y14","موانئ يمنية","موانئ يمنية","عام","ميناء عدن يتبع:",["مؤسسة موانئ خليج عدن اليمنية","مؤسسة موانئ البحر العربي","مؤسسة موانئ البحر الأحمر","وزارة الزراعة"],0,"الموقع الرسمي لميناء عدن تابع لمؤسسة موانئ خليج عدن.","Aden → YGAPC."),
+q("y15","موانئ يمنية","موانئ يمنية","كواسر","وظيفة كاسر رأس مربط في ميناء عدن:",["حماية الميناء الداخلي وتهدئة الأمواج","زيادة الأمواج","رفع الملوحة","منع السفن"],0,"ميناء عدن يذكر أن الكاسر يحمي الميناء الداخلي ويساعده على العمل بأمان.","Breakwater → calmer inner harbour."),
+q("y16","موانئ يمنية","موانئ يمنية","ملاحة","عمق القناة الداخلية في ميناء عدن يقارب:",["15m","5m","50m","1.5m"],0,"البيانات الملاحية الرسمية تذكر 15m.","Aden inner channel depth = 15m."),
+q("y17","موانئ يمنية","موانئ يمنية","ملاحة","عرض القناة الداخلية في ميناء عدن يقارب:",["220m","22m","520m","1000m"],0,"البيانات الرسمية تذكر 220m.","Aden inner channel width = 220m."),
+q("y18","موانئ يمنية","موانئ يمنية","ملاحة","قطر منطقة الدوران قرب ACT في عدن يقارب:",["700m","70m","1700m","300m"],0,"الموقع الرسمي يذكر 700m.","Turning area diameter ≈700m."),
+q("y19","موانئ يمنية","موانئ يمنية","عام","من خدمات القسم البحري في عدن:",["الإرشاد والقطر وربط وفك السفن","تصنيع السيارات","إدارة المطارات","التعدين"],0,"هذه خدمات بحرية رسمية بالميناء.","Pilotage + Towage + Mooring."),
+q("y20","موانئ يمنية","موانئ يمنية","عام","ميناء نشطون أُنشئ أساسًا كميناء:",["متعدد الأغراض","جوي","نهري","خاص بالقطارات"],0,"الموقع الرسمي يصفه كميناء متعدد الأغراض.","Commercial + fishery traffic.")
+];
+
+function G(){
+var r=[],id=1;
+function add(cat,diff,question,ops,ans,exp,st){r.push(q("g"+(id++),"جديدة",cat,diff,question,ops,ans,exp,st))}
+var T;
+for(T=4;T<=23;T++){var L=1.56*T*T;add("الأمواج","حسابي","في المياه العميقة، إذا كان \\(T="+T+"s\\)، فما \\(L_0\\) تقريبًا؟",[Math.round(L)+"m",Math.round(L*.75)+"m",Math.round(L*1.25)+"m",Math.round(L+30)+"m"],0,"استخدم علاقة طول الموجة العميقة.","$$L_0=1.56T^2=1.56("+T+")^2="+L.toFixed(2)+"m$$")}
+for(T=4;T<=23;T++){var C=1.56*T;add("الأمواج","حسابي","إذا كان \\(T="+T+"s\\)، فما \\(C_0\\) في المياه العميقة؟",[C.toFixed(1)+"m/s",(C*.7).toFixed(1)+"m/s",(C*1.3).toFixed(1)+"m/s",(C+4).toFixed(1)+"m/s"],0,"سرعة المياه العميقة تتناسب مع الزمن الدوري.","$$C_0=1.56T=1.56("+T+")="+C.toFixed(2)+"m/s$$")}
+for(var i=10;i<=29;i++){var Ht=i/10,E=1.03*Ht*Ht/8;add("الأمواج","حسابي","إذا كان \\(H="+Ht.toFixed(1)+"m\\) و\\(\\gamma=1.03t/m^3\\)، فما \\(E\\)؟",[E.toFixed(3),(E*2).toFixed(3),(E*.5).toFixed(3),(E+.2).toFixed(3)],0,"الطاقة تتناسب مع مربع ارتفاع الموجة.","$$E=\\gamma H^2/8="+E.toFixed(3)+"$$")}
+for(var Ls=80;Ls<=270;Ls+=10){add("تخطيط الموانئ","حسابي","إذا كان طول السفينة \\(L="+Ls+"m\\)، فما نصف قطر الدوران حسب \\(R=2L\\)؟",[(2*Ls)+"m",(1.5*Ls)+"m",Ls+"m",(2.5*Ls)+"m"],0,"اضرب طول السفينة في 2.","$$R=2("+Ls+")="+(2*Ls)+"m$$")}
+for(var B=12;B<=31;B++){var W=1.6*B;add("تخطيط الموانئ","حسابي","لسفينة عرضها \\(B="+B+"m\\)، ما عرض حارة واحدة عند تحكم جيد؟",[W.toFixed(1)+"m",(2*B).toFixed(1)+"m",(1.2*B).toFixed(1)+"m",(2.5*B).toFixed(1)+"m"],0,"استخدم 160% من عرض السفينة.","$$B_c=1.6("+B+")="+W.toFixed(1)+"m$$")}
+var rr=[.01,.02,.03,.039,.04,.05,.08,.12,.2,.3,.4,.49,.5,.55,.6,.7,.8,.9,.025,.15];
+rr.forEach(function(x){var typ=x<.04?"مياه ضحلة":(x>=.5?"مياه عميقة":"مياه انتقالية");var ops=["مياه ضحلة","مياه انتقالية","مياه عميقة","لا يمكن"];add("الأمواج","مفهومي","إذا كانت \\(d/L="+x+"\\)، فما التصنيف؟",ops,ops.indexOf(typ),"تذكر حدود التصنيف.","$$d/L<0.04: shallow\\quad 0.04\\le d/L<0.5: transitional\\quad d/L\\ge0.5: deep$$")});
+var cc=[
+["ارتداد الموجة عن حائط صلب يسمى:",["Reflection","Breaking","Diffraction","Shoaling"],0,"الانعكاس هو رجوع الموجة."],
+["انحناء جبهة الموجة بسبب تغير العمق يسمى:",["Refraction","Reflection","Tide","Fetch"],0,"الانكسار الاتجاهي بسبب تغير السرعة مع العمق."],
+["انتشار الموجة خلف فتحة أو رأس كاسر يسمى:",["Diffraction","Reflection","Tide","Mooring"],0,"هذا هو الحيود."],
+["زيادة ارتفاع الموجة عند الضحولة قبل الانكسار ترتبط بـ:",["Shoaling","Towage","Bunkering","Dredging"],0,"هذا هو تأثير الضحولة."],
+["المسافة الأفقية بين قمتين متتاليتين:",["L","H","T","d"],0,"هي طول الموجة."],
+["المسافة الرأسية بين القمة والقاع:",["H","L","T","Fetch"],0,"هي ارتفاع الموجة."],
+["الزمن بين قمتين متتاليتين عند نقطة ثابتة:",["T","L","H","B"],0,"هو الزمن الدوري."],
+["Fetch يعني:",["مسافة هبوب الرياح فوق الماء","عرض الرصيف","الغاطس","سمك Armor"],0,"مسافة نمو الموجة تحت الرياح."],
+["سرعة المجموعة ترتبط بـ:",["انتقال طاقة الموجة","لون الماء","الوقود","الحاويات"],0,"Cg سرعة انتقال حزمة/طاقة الموجة."],
+["الهدف العام لكاسر الأمواج:",["تهدئة الحوض وحمايته","زيادة الأمواج","رفع الملوحة","إلغاء الأرصفة"],0,"يوفر منطقة أهدأ للرسو والمناورة."],
+["Armor Layer هي:",["الطبقة الخارجية الكبيرة","النواة","المنارة","القناة"],0,"خط الدفاع الخارجي."],
+["Core هي:",["الجزء الداخلي بأحجار أصغر","أكبر أحجار الرأس","الرصيف","المنارة"],0,"النواة الداخلية."],
+["Underlayer تقع:",["بين Armor وCore","فوق المنارة","داخل السفينة","خارج البحر"],0,"طبقة انتقالية."],
+["المد الربيعي يرتبط غالبًا بـ:",["البدر والمحاق","التربيعين فقط","الرياح فقط","الأمطار"],0,"اصطفاف تقريبي للشمس والقمر."],
+["Neap Tide يرتبط غالبًا بـ:",["التربيعين","البدر فقط","المحاق فقط","العواصف فقط"],0,"تكون المديات أقل نسبيًا."]
+];
+for(var k=0;k<cc.length;k++){for(var z=0;z<2;z++)add(k<9?"الأمواج":"كواسر الأمواج","أساسي",cc[k][0],cc[k][1],cc[k][2],cc[k][3],cc[k][3])}
+return r
+}
+var Q=A.concat(H,G(),Y);
+document.getElementById("total").textContent=Q.length+" سؤال";
+
+var ses=[],cur=0,ans={},score=0;
+function sh(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function show(v){document.getElementById("start").classList.toggle("hidden",v!="start");document.getElementById("quiz").classList.toggle("hidden",v!="quiz");document.getElementById("result").classList.toggle("hidden",v!="result")}
+function typ(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().catch(function(){})}
+function sources(){var x=document.querySelectorAll("#srcs input:checked"),a=[];for(var i=0;i<x.length;i++)a.push(x[i].value);return a}
+function begin(newOnly){var s=newOnly?["جديدة"]:sources();if(!s.length){alert("اختر مصدرًا واحدًا على الأقل");return}var p=Q.filter(function(x){return s.indexOf(x.source)>=0});if(document.getElementById("order").value=="random")sh(p);var n=parseInt(document.getElementById("count").value,10);ses=p.slice(0,Math.min(n,p.length));cur=0;ans={};score=0;show("quiz");render()}
+function render(){var x=ses[cur],a=ans[x.id];document.getElementById("n").textContent=(cur+1)+" / "+ses.length;document.getElementById("mini").textContent="النتيجة: "+score;document.getElementById("prog").style.width=((cur+1)/ses.length*100)+"%";document.getElementById("src").textContent=x.source;document.getElementById("cat").textContent=x.category;document.getElementById("diff").textContent=x.difficulty;document.getElementById("qt").innerHTML=x.question;document.getElementById("ep").innerHTML="<b>شرح بسيط:</b><br>"+x.explanation;document.getElementById("sp").innerHTML="<b>خطوات الحل:</b><br>"+x.steps;document.getElementById("ep").classList.add("hidden");document.getElementById("sp").classList.add("hidden");var o=document.getElementById("opts");o.innerHTML="";x.options.forEach(function(t,i){var b=document.createElement("button");b.className="opt";b.innerHTML="<b>"+String.fromCharCode(65+i)+"</b> · "+t;if(a!==undefined){b.disabled=true;if(i==x.answer)b.classList.add("correct");if(i==a&&a!=x.answer)b.classList.add("wrong")}b.onclick=function(){pick(i)};o.appendChild(b)});if(a!==undefined)feedback(x,a);else document.getElementById("fb").classList.add("hidden");document.getElementById("prev").disabled=cur==0;document.getElementById("next").textContent=cur==ses.length-1?"إنهاء":"التالي";typ()}
+function pick(i){var x=ses[cur];if(ans[x.id]!==undefined)return;ans[x.id]=i;if(i==x.answer)score++;localStorage.setItem("portsQuiz",JSON.stringify({score:score,answers:ans}));render()}
+function feedback(x,a){document.getElementById("fb").classList.remove("hidden");document.getElementById("res").innerHTML=a==x.answer?"<span style='color:#45d483'>✓ إجابة صحيحة</span>":"<span style='color:#ff6b78'>✗ إجابة خاطئة</span>";document.getElementById("why").innerHTML=x.explanation+"<br><b>الإجابة الصحيحة:</b> "+x.options[x.answer]}
+function done(){var t=ses.length,w=t-score,p=Math.round(score/Math.max(t,1)*100);document.getElementById("pct").textContent=p+"%";document.getElementById("msg").textContent=p>=85?"ممتاز جدًا. أعد فقط الأسئلة التي أخطأت فيها.":p>=65?"جيد. جولة ثانية على الأخطاء وستثبت الأفكار.":"ابدأ بجولة قصيرة واستخدم زر خطوات الحل قبل الإجابة.";document.getElementById("ok").textContent=score;document.getElementById("bad").textContent=w;document.getElementById("tot").textContent=t;document.getElementById("retry").disabled=w==0;show("result")}
+document.getElementById("go").onclick=function(){begin(false)};document.getElementById("newOnly").onclick=function(){begin(true)};document.getElementById("home").onclick=function(){show("start")};document.getElementById("again").onclick=function(){show("start")};document.getElementById("prev").onclick=function(){if(cur>0){cur--;render()}};document.getElementById("next").onclick=function(){if(cur<ses.length-1){cur++;render()}else done()};document.getElementById("ex").onclick=function(){document.getElementById("ep").classList.toggle("hidden");typ()};document.getElementById("steps").onclick=function(){document.getElementById("sp").classList.toggle("hidden");typ()};document.getElementById("retry").onclick=function(){ses=sh(ses.filter(function(x){return ans[x.id]!=x.answer}));cur=0;ans={};score=0;show("quiz");render()};
+</script>
+</body></html>
