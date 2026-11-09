@@ -1,10 +1,32 @@
 import json
 import os
 import urllib.parse
+from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from engine import cached_conduct, aliases_for, planned_queries, resolve_known
 from ui import PAGE
+
+@lru_cache(maxsize=1)
+def discussion_archive():
+    data_path=os.path.join(os.path.dirname(__file__), "mbzuai_discussions.json")
+    with open(data_path,"r",encoding="utf-8") as handle:
+        db=json.load(handle)
+    clean=[]
+    for item in db.get("results",[]):
+        url=item.get("url","")
+        if not url.startswith("https://www.reddit.com/r/MBZUAI/comments/"):
+            continue
+        clean.append({
+            "platform":"Reddit", "type":"discussion",
+            "title":str(item.get("title",""))[:180],
+            "url":url,
+            "description":str(item.get("description",""))[:350],
+            "verification":"indexed-unverified"
+        })
+    return {"university":"MBZUAI","count":len(clean),
+            "source":"Publicly indexed Reddit community threads; not group invitations",
+            "checked":"2026-11-09","verification":"not individually live-verified","results":clean}
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -29,6 +51,17 @@ class Handler(BaseHTTPRequestHandler):
             return self.respond(200,PAGE,"text/html; charset=utf-8")
         if path.path=="/health":
             return self.respond(200,json.dumps({"ok":True,"version":"2.0","streaming":True,"aliasDetection":True}))
+        if path.path=="/api/archive":
+            params=urllib.parse.parse_qs(path.query)
+            university=params.get("university",[""])[0].strip()
+            if not 2 <= len(university) <= 110:
+                return self.respond(400,json.dumps({"error":"اسم الجامعة غير صحيح"},ensure_ascii=False))
+            if resolve_known(university)!="mbzuai":
+                return self.respond(200,json.dumps({"university":university,"count":0,"results":[],"source":"No indexed archive for this university"},ensure_ascii=False))
+            try:
+                return self.respond(200,json.dumps(discussion_archive(),ensure_ascii=False))
+            except OSError:
+                return self.respond(503,json.dumps({"error":"أرشيف النقاشات غير متاح"},ensure_ascii=False))
         if path.path=="/api/self-test":
             aliases,keys,known=aliases_for("جامعة محمد بن زايد للذكاء الاصطناعي")
             passed=known=="mbzuai" and "MBZUAI" in aliases and len(planned_queries(aliases,"deep",keys))>=20
