@@ -26,6 +26,7 @@ AKA = {
         "seeds": [
             ("Discord", "MBZUAI Unofficial", "https://discord.gg/EXnhnsDTHq", "مجتمع طلابي غير رسمي، صفحة الدعوة عُرضت عند الفحص", "https://discord.com/invite/EXnhnsDTHq", "invite-page-verified"),
             ("Discord", "MBZUAI Bachelors", "https://discord.gg/gskaQe9BCY", "طلاب البكالوريوس، صفحة الدعوة عُرضت عند الفحص", "https://discord.com/invite/gskaQe9BCY", "invite-page-verified"),
+            ("Discord", "MBZUAI Graduate Prep", "https://discord.gg/w6GUzBjF93", "مجتمع غير رسمي للتحضير للماجستير والدكتوراه، تم فحص صفحة الدعوة", "https://www.reddit.com/r/MBZUAI/comments/1ox3s6t/there_is_a_discord_link_for_people_preparing_for/", "invite-page-verified"),
             ("Telegram", "MBZUAI Eurasia", "https://t.me/mbzuai_eurasia", "مجموعة مرتبطة بمتقدمي الجامعة من أوراسيا", "https://t.me/mbzuai_eurasia", "invite-page-verified"),
             ("WhatsApp", "MBZUAI UG Aspirants 26", "https://chat.whatsapp.com/EJP2ygiOHldL4X8ZIMMSB5", "متقدمو البكالوريوس، رابط معلن في دليل غير رسمي", "https://iglory.notion.site/the-unofficial-complete-guide-to-mbzuai", "public-link-unverified"),
             ("WhatsApp", "MBZUAI Admission Discussion", "https://chat.whatsapp.com/JAP5SYvIRmd2owoscocgqY", "نقاشات القبول، رابط معلن في دليل غير رسمي", "https://iglory.notion.site/the-unofficial-complete-guide-to-mbzuai", "public-link-unverified"),
