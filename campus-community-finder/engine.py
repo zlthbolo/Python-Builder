@@ -115,7 +115,7 @@ def aliases_for(university):
     english=[x for x in unique if re.search(r'[a-zA-Z]',x) and x not in short]
     arabic=[x for x in unique if re.search(r'[\u0600-\u06ff]',x)]
     ordered=[]
-    for a in [*short,*english,*arabic,*unique]:
+    for a in [*short[:1],*english[:1],*arabic[:1],*short[1:],*english[1:],*arabic[1:],*unique]:
         if a not in ordered:ordered.append(a)
     return ordered[:6],keywords,known
 
