@@ -199,6 +199,12 @@ def result_item(platform,title,url,desc,source,verification,aliases):
     canonical=clean_url(url)
     if not canonical:return None
     p=platform_for(canonical)
+    if verification=="indexed-unverified":
+        host=urllib.parse.urlsplit(canonical).hostname or ""
+        if host.endswith("wikipedia.org") or host.endswith("wikidata.org"):
+            return None
+        if p=="Web" and not any(signal in norm(title+" "+desc) for signal in ("students","طلاب","دفعة","applicants","group","forum","discord","telegram","whatsapp","reddit","discussion","استفسارات","مجتمع طلاب","student life")):
+            return None
     rank=relevance(title,desc,canonical,aliases)
     if rank<4 and verification not in ("invite-page-verified","public-link-unverified","public-community"):return None
     return {"platform":p if p!="Web" else platform,"title":title[:170],"url":canonical,"snippet":desc[:400],
