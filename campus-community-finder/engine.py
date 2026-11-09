@@ -203,8 +203,12 @@ def result_item(platform,title,url,desc,source,verification,aliases):
         host=urllib.parse.urlsplit(canonical).hostname or ""
         if host.endswith("wikipedia.org") or host.endswith("wikidata.org"):
             return None
-        if p=="Web" and not any(signal in norm(title+" "+desc) for signal in ("students","طلاب","دفعة","applicants","group","forum","discord","telegram","whatsapp","reddit","discussion","استفسارات","مجتمع طلاب","student life")):
-            return None
+        if p=="Web":
+            if host.endswith(".edu") or re.search(r"\.(?:edu|ac)\.[a-z]{2}$",host):
+                return None
+            cues=("discussion","group","groups","forum","discord","telegram","whatsapp","reddit","student community","student group","applicants community","استفسارات","قروب","مجموعة","منتدى","مناقشات","مجتمع الطلاب","ملتقى الطلاب")
+            if not any(signal in norm(title+" "+desc) for signal in cues):
+                return None
     rank=relevance(title,desc,canonical,aliases)
     if rank<4 and verification not in ("invite-page-verified","public-link-unverified","public-community"):return None
     return {"platform":p if p!="Web" else platform,"title":title[:170],"url":canonical,"snippet":desc[:400],
